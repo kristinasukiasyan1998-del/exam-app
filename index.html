@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Project Management Fundamentals — Exam</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;color:#1a1a1a;min-height:100vh;}
+#app{max-width:680px;margin:0 auto;padding:1rem 1rem 3rem;}
+.screen{display:none;}.screen.active{display:block;}
+.exam-header{background:#fff;border-radius:14px;border:1px solid #e8e8e0;padding:1.25rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.exam-title{font-size:17px;font-weight:600;}
+.exam-sub{font-size:13px;color:#888;margin-top:2px;}
+.timer{display:inline-flex;align-items:center;font-size:15px;font-weight:600;color:#555;background:#f5f5f0;border-radius:8px;padding:7px 14px;border:1px solid #e8e8e0;}
+.timer.warn{color:#c0392b;background:#fdf0ef;border-color:#f5c6c2;}
+.progress-wrap{background:#e8e8e0;border-radius:99px;height:5px;margin-bottom:1rem;}
+.progress-fill{background:#1D9E75;border-radius:99px;height:5px;transition:width 0.4s;}
+.section-badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:10px;}
+.section-badge.mc{background:#E1F5EE;color:#085041;}
+.section-badge.open{background:#E6F1FB;color:#0C447C;}
+.card{background:#fff;border-radius:14px;border:1px solid #e8e8e0;padding:1.25rem;margin-bottom:1rem;}
+.q-num{font-size:12px;color:#aaa;font-weight:500;margin-bottom:6px;}
+.q-text{font-size:16px;font-weight:500;line-height:1.55;margin-bottom:1.1rem;}
+.choice{display:flex;align-items:center;gap:12px;padding:11px 14px;border:1px solid #e8e8e0;border-radius:10px;margin-bottom:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.choice:hover{background:#f9f9f6;}
+.choice.sel{background:#E1F5EE;border-color:#1D9E75;}
+.cletter{width:30px;height:30px;border-radius:50%;background:#f5f5f0;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#888;flex-shrink:0;}
+.choice.sel .cletter{background:#1D9E75;border-color:#1D9E75;color:#fff;}
+.ctext{font-size:15px;line-height:1.4;}
+textarea{width:100%;border:1px solid #ddd;border-radius:10px;padding:12px;font-size:15px;font-family:inherit;resize:vertical;min-height:110px;outline:none;}
+textarea:focus{border-color:#1D9E75;}
+.open-hint{font-size:12px;color:#aaa;margin-top:6px;}
+.nav{display:flex;justify-content:space-between;margin-top:1rem;gap:8px;}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:11px 22px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;border:1px solid #ddd;background:#fff;transition:background 0.12s;}
+.btn:hover{background:#f5f5f0;}
+.btn:disabled{opacity:0.35;cursor:not-allowed;}
+.btn.primary{background:#1D9E75;border-color:#1D9E75;color:#fff;font-weight:600;}
+.btn.primary:hover{background:#0F6E56;}
+.welcome-card{background:#fff;border-radius:16px;border:1px solid #e8e8e0;padding:2rem;text-align:center;margin-top:2rem;}
+.welcome-icon{width:64px;height:64px;background:#E1F5EE;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:28px;}
+.welcome-title{font-size:22px;font-weight:700;margin-bottom:8px;}
+.welcome-sub{font-size:14px;color:#888;margin-bottom:1.5rem;line-height:1.6;}
+.info-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:1.75rem;}
+.info-pill{background:#f5f5f0;border-radius:99px;padding:7px 16px;font-size:13px;font-weight:500;color:#555;border:1px solid #e8e8e0;}
+.name-row{margin-bottom:1.25rem;text-align:left;}
+.name-row label{font-size:13px;font-weight:500;color:#555;display:block;margin-bottom:6px;}
+.name-row input{width:100%;border:1px solid #ddd;border-radius:10px;padding:11px 14px;font-size:15px;font-family:inherit;outline:none;}
+.name-row input:focus{border-color:#1D9E75;}
+.score-wrap{text-align:center;padding:1.5rem 0 1rem;}
+.score-circle{width:120px;height:120px;border-radius:50%;border:5px solid #1D9E75;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 1rem;}
+.score-num{font-size:30px;font-weight:700;color:#1D9E75;}
+.score-lbl{font-size:12px;color:#aaa;}
+.grade-badge{display:inline-block;font-size:13px;font-weight:600;padding:4px 14px;border-radius:99px;margin-bottom:1rem;}
+.result-item{padding:12px 0;border-bottom:1px solid #f0f0ea;}
+.result-item:last-child{border-bottom:none;}
+.result-q{font-size:13px;color:#888;margin-bottom:4px;line-height:1.4;}
+.result-a{font-size:14px;line-height:1.5;}
+.badge-r{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;margin-left:4px;}
+.badge-r.ok{background:#E1F5EE;color:#085041;}
+.badge-r.no{background:#fdf0ef;color:#c0392b;}
+.badge-r.open{background:#E6F1FB;color:#0C447C;}
+.badge-r.skip{background:#f5f5f0;color:#888;}
+.spinner{width:36px;height:36px;border:3px solid #e8e8e0;border-top-color:#1D9E75;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="screen-welcome" class="screen active">
+  <div class="welcome-card">
+    <div class="welcome-icon">📋</div>
+    <div class="welcome-title">Project Management Fundamentals</div>
+    <div class="welcome-sub">Read each question carefully. The exam has multiple choice and open-ended questions. Your results will be saved automatically when you finish.</div>
+    <div class="info-row">
+      <div class="info-pill">⏱ 40 minutes</div>
+      <div class="info-pill">📝 25 questions</div>
+      <div class="info-pill">Section A + Section B</div>
+    </div>
+    <div class="name-row">
+      <label>Your full name</label>
+      <input type="text" id="student-name" placeholder="Enter your name before starting..." />
+    </div>
+    <button class="btn primary" style="width:100%;font-size:16px;padding:14px;" onclick="beginExam()">Start exam →</button>
+  </div>
+</div>
+
+<div id="screen-exam" class="screen">
+  <div class="exam-header">
+    <div>
+      <div class="exam-title">Project Management Fundamentals</div>
+      <div class="exam-sub" id="student-label"></div>
+    </div>
+    <div id="timer-display" class="timer">40:00</div>
+  </div>
+  <div class="progress-wrap"><div class="progress-fill" id="pfill" style="width:0%"></div></div>
+  <div id="q-counter" style="font-size:13px;color:#aaa;margin-bottom:10px;"></div>
+  <div id="q-area"></div>
+  <div class="nav">
+    <button class="btn" id="btn-prev" onclick="go(-1)">← Back</button>
+    <button class="btn primary" id="btn-next" onclick="go(1)">Next →</button>
+  </div>
+</div>
+
+<div id="screen-submitting" class="screen">
+  <div class="card" style="margin-top:2rem;text-align:center;padding:2rem;">
+    <div class="spinner"></div>
+    <div style="font-size:15px;color:#888;">Saving your results...</div>
+  </div>
+</div>
+
+<div id="screen-results" class="screen">
+  <div class="score-wrap">
+    <div class="score-circle">
+      <div class="score-num" id="res-score">—</div>
+      <div class="score-lbl">correct</div>
+    </div>
+    <div style="font-size:15px;color:#555;margin-bottom:4px;" id="res-pct"></div>
+    <div class="grade-badge" id="res-grade"></div>
+    <div style="font-size:13px;color:#aaa;" id="res-name-display"></div>
+    <div style="font-size:13px;color:#1D9E75;margin-top:8px;">✓ Results saved successfully</div>
+  </div>
+  <div class="card">
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px;">Answer review</div>
+    <div id="res-list"></div>
+  </div>
+</div>
+
+</div>
+<script>
+const SUPABASE_URL='https://zlykfsiglfcddzaadrca.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpseWtmc2lnbGZjZGR6YWFkcmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MDE4NTAsImV4cCI6MjA5MDk3Nzg1MH0.zpWos9F4jQItsGaMVNOlEQdW93LciDaEAI-YPSRQfzM';
+
+const QUESTIONS=[
+  {id:1,type:'mc',section:'A',text:'What is the primary objective of project management?',choices:['Increase profit only','Deliver a unique product or service','Maintain daily operations','Reduce employee workload'],correct:1},
+  {id:2,type:'mc',section:'A',text:'Which of the following is NOT part of the Triple Constraint?',choices:['Scope','Time','Cost','Quality'],correct:3},
+  {id:3,type:'mc',section:'A',text:'What does WBS stand for?',choices:['Work Breakdown Structure','Work Base System','Workflow Business System','Work Balance Sheet'],correct:0},
+  {id:4,type:'mc',section:'A',text:'A project stakeholder is:',choices:['Only the project manager','Anyone affected by the project','Only investors','Only team members'],correct:1},
+  {id:5,type:'mc',section:'A',text:'What is a milestone?',choices:['A project risk','A significant event or checkpoint','A budget plan','A task list'],correct:1},
+  {id:6,type:'mc',section:'A',text:'Which document defines project scope?',choices:['Risk register','Scope statement','Schedule baseline','Budget report'],correct:1},
+  {id:7,type:'mc',section:'A',text:'What is the main purpose of a Gantt chart?',choices:['Budget tracking','Risk analysis','Schedule visualization','Stakeholder mapping'],correct:2},
+  {id:8,type:'mc',section:'A',text:'Risk is defined as:',choices:['A guaranteed problem','An uncertain event that may affect objectives','A completed task','A project success'],correct:1},
+  {id:9,type:'mc',section:'A',text:'What does CPI stand for in Earned Value Management?',choices:['Cost Performance Index','Cost Planning Indicator','Control Performance Index','Cost Project Index'],correct:0},
+  {id:10,type:'mc',section:'A',text:'What is the first phase of a project lifecycle?',choices:['Planning','Execution','Initiation','Closing'],correct:2},
+  {id:11,type:'mc',section:'A',text:'What is the role of a project manager?',choices:['Do all technical work','Manage resources and achieve objectives','Only report to stakeholders','Focus only on cost'],correct:1},
+  {id:12,type:'mc',section:'A',text:'What is a deliverable?',choices:['A project risk','A measurable output','A team member','A deadline'],correct:1},
+  {id:13,type:'mc',section:'A',text:'Stakeholder mapping helps to:',choices:['Assign tasks','Identify and analyze stakeholders','Reduce costs','Create schedules'],correct:1},
+  {id:14,type:'mc',section:'A',text:'What is scope creep?',choices:['Planned scope expansion','Uncontrolled changes to scope','Budget increase','Schedule delay'],correct:1},
+  {id:15,type:'mc',section:'A',text:'What is the main purpose of a risk matrix?',choices:['Define budget','Evaluate risk probability and impact','Assign roles','Track progress'],correct:1},
+  {id:16,type:'mc',section:'A',text:'What is a baseline in project management?',choices:['Initial idea','Approved plan for comparison','Risk list','Communication plan'],correct:1},
+  {id:17,type:'mc',section:'A',text:'Change control is used to:',choices:['Avoid communication','Manage changes systematically','Increase risks','Delay project'],correct:1},
+  {id:18,type:'mc',section:'A',text:'What is a critical path?',choices:['Shortest project path','Longest sequence of dependent tasks','Cheapest tasks','Optional tasks'],correct:1},
+  {id:19,type:'mc',section:'A',text:'A communication plan defines:',choices:['Budget details','How information is shared','Risk levels','Task durations'],correct:1},
+  {id:20,type:'mc',section:'A',text:'Project closure includes:',choices:['Starting tasks','Finalizing and evaluating the project','Planning budget','Assigning roles'],correct:1},
+  {id:21,type:'open',section:'B',text:'Explain the concept of the Triple Constraint and how changing one element affects the others.'},
+  {id:22,type:'open',section:'B',text:'Explain the purpose of a Work Breakdown Structure (WBS) and how it helps in project planning.'},
+  {id:23,type:'open',section:'B',text:'Explain the importance of risk management and provide an example of risk mitigation.'},
+  {id:24,type:'open',section:'B',text:'Describe the difference between a project and operations, with examples.'},
+  {id:25,type:'open',section:'B',text:'You have a limited budget but high project expectations. How would you manage this situation logically?'},
+];
+
+const L=['A','B','C','D'];
+let ans={},cur=0,ti=null,sLeft=40*60,studentName='';
+
+function beginExam(){
+  const n=document.getElementById('student-name').value.trim();
+  if(!n){document.getElementById('student-name').style.borderColor='#e74c3c';document.getElementById('student-name').focus();return;}
+  studentName=n;
+  document.getElementById('student-label').textContent=n;
+  show('screen-exam');renderQ();startTimer();
+}
+
+function startTimer(){
+  clearInterval(ti);updateTimer();
+  ti=setInterval(()=>{sLeft--;updateTimer();if(sLeft<=0){clearInterval(ti);submitExam();}},1000);
+}
+
+function updateTimer(){
+  const m=Math.floor(sLeft/60),s=sLeft%60;
+  const el=document.getElementById('timer-display');
+  el.textContent=m+':'+(s<10?'0':'')+s;
+  el.className='timer'+(sLeft<120?' warn':'');
+}
+
+function renderQ(){
+  const q=QUESTIONS[cur],total=QUESTIONS.length;
+  document.getElementById('pfill').style.width=Math.round(cur/total*100)+'%';
+  document.getElementById('q-counter').textContent='Question '+(cur+1)+' of '+total;
+  const sec=q.section==='A'?'<span class="section-badge mc">Section A — Multiple choice</span>':'<span class="section-badge open">Section B — Open answer</span>';
+  const saved=ans[q.id];
+  let html='<div class="card">'+sec+'<div class="q-num">Question '+(cur+1)+'</div><div class="q-text">'+q.text+'</div>';
+  if(q.type==='mc'){
+    html+=q.choices.map((c,i)=>'<div class="choice'+(saved===i?' sel':'')+'" onclick="pick('+i+')"><div class="cletter">'+L[i]+'</div><div class="ctext">'+c+'</div></div>').join('');
+  }else{
+    html+='<textarea id="ota" placeholder="Write your answer here..." oninput="ans['+q.id+']=this.value">'+(saved||'')+'</textarea><div class="open-hint">Your answer will be reviewed by the instructor.</div>';
+  }
+  document.getElementById('q-area').innerHTML=html+'</div>';
+  document.getElementById('btn-prev').disabled=cur===0;
+  document.getElementById('btn-next').textContent=cur===total-1?'Submit exam':'Next →';
+}
+
+function pick(idx){ans[QUESTIONS[cur].id]=idx;renderQ();}
+
+function go(dir){
+  if(dir===1&&cur===QUESTIONS.length-1){
+    if(!confirm('Submit the exam? You cannot go back after this.'))return;
+    submitExam();return;
+  }
+  cur=Math.max(0,Math.min(QUESTIONS.length-1,cur+dir));renderQ();
+}
+
+async function submitExam(){
+  clearInterval(ti);show('screen-submitting');
+  let correct=0,mcTotal=0;
+  const payload=[];
+  QUESTIONS.forEach((q,i)=>{
+    const a=ans[q.id];
+    if(q.type==='mc'){
+      mcTotal++;
+      const ok=a===q.correct;
+      if(ok)correct++;
+      payload.push({qid:q.id,qnum:i+1,type:'mc',question:q.text,answer:a!==undefined?L[a]+' — '+q.choices[a]:'(not answered)',correct:ok,correctAnswer:L[q.correct]+' — '+q.choices[q.correct]});
+    }else{
+      payload.push({qid:q.id,qnum:i+1,type:'open',question:q.text,answer:ans[q.id]||'(skipped)'});
+    }
+  });
+  const pct=Math.round(correct/mcTotal*100);
+  try{
+    await fetch(SUPABASE_URL+'/rest/v1/results',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Prefer':'return=minimal'},
+      body:JSON.stringify({student_name:studentName,score_mc:correct,total_mc:mcTotal,percentage:pct,answers:payload})
+    });
+  }catch(e){console.error(e);}
+  showResults(correct,mcTotal,pct,payload);
+}
+
+function showResults(correct,mcTotal,pct,payload){
+  let grade,gs;
+  if(pct>=90){grade='Excellent';gs='background:#E1F5EE;color:#085041;';}
+  else if(pct>=75){grade='Good';gs='background:#E6F1FB;color:#0C447C;';}
+  else if(pct>=60){grade='Satisfactory';gs='background:#FAEEDA;color:#633806;';}
+  else{grade='Needs improvement';gs='background:#fdf0ef;color:#c0392b;';}
+  document.getElementById('res-score').textContent=correct+'/'+mcTotal;
+  document.getElementById('res-pct').textContent=pct+'% on multiple choice';
+  document.getElementById('res-grade').setAttribute('style',gs);
+  document.getElementById('res-grade').textContent=grade;
+  document.getElementById('res-name-display').textContent=studentName;
+  let html='';
+  payload.forEach(a=>{
+    if(a.type==='mc'){
+      const b='<span class="badge-r '+(a.correct?'ok':'no')+'">'+(a.correct?'✓ correct':'✗ '+a.correctAnswer)+'</span>';
+      html+='<div class="result-item"><div class="result-q">Q'+a.qnum+': '+a.question+' '+b+'</div><div class="result-a">Your answer: '+a.answer+'</div></div>';
+    }else{
+      const b=a.answer!=='(skipped)'?'<span class="badge-r open">answered</span>':'<span class="badge-r skip">skipped</span>';
+      html+='<div class="result-item"><div class="result-q">Q'+a.qnum+': '+a.question+' '+b+'</div><div class="result-a">'+a.answer+'</div></div>';
+    }
+  });
+  document.getElementById('res-list').innerHTML=html;
+  show('screen-results');
+}
+
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+</script>
+</body>
+</html>
