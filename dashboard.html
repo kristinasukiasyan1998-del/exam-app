@@ -210,19 +210,21 @@ function render(){
 function buildPanel(r){
   const rid=r.id;
   if(!grades[rid])grades[rid]={};
-  const ans=r.answers||{};
+  // answers can be array or object — normalise to array
+  const rawAns=r.answers||[];
+  const ansArr=Array.isArray(rawAns)?rawAns:Object.values(rawAns);
 
   let h='<div class="sec-title">Section A — Multiple choice</div>';
-  for(let q=1;q<=20;q++){
-    const a=ans['q'+q]; if(!a)continue;
+  ansArr.filter(a=>a.type==='mc').forEach(a=>{
     const b=a.correct?'<span class="br ok">✓</span>':'<span class="br no">✗ '+a.correctAnswer+'</span>';
-    h+=`<div class="ans-row"><div class="ans-q">Q${q}: ${a.question}${b}</div><div class="ans-a">${a.answer||'(not answered)'}</div></div>`;
-  }
+    h+=`<div class="ans-row"><div class="ans-q">Q${a.qnum}: ${a.question}${b}</div><div class="ans-a">${a.answer||'(not answered)'}</div></div>`;
+  });
 
   h+='<div class="sec-title">Section B — Open answers &nbsp;<span style="font-weight:400;color:#aaa;">(grade each question 0–10)</span></div>';
-  OPEN_QS.forEach(qnum=>{
-    const a=ans['q'+qnum];
-    const answered=a&&a.answer;
+  const openAnswers=ansArr.filter(a=>a.type==='open');
+  OPEN_QS.forEach((qnum,oi)=>{
+    const a=openAnswers[oi];
+    const answered=a&&a.answer&&a.answer!=='(skipped)';
     const cur=grades[rid][qnum]!==undefined?grades[rid][qnum]:'';
     const badge=answered?'<span class="br op">answered</span>':'<span class="br sk">skipped</span>';
     h+=`<div class="ans-row">
@@ -233,7 +235,7 @@ function buildPanel(r){
         <input type="number" class="si" min="0" max="10" value="${cur}" placeholder="—"
           id="gi-${rid}-${qnum}"
           oninput="updateGrade('${rid}',${qnum},this.value)"
-          ${!answered?'disabled':''}/>
+          ${!answered?'disabled title="Student skipped this question"':''}/>
         <span style="font-size:13px;color:#aaa;">/ 10</span>
         <span class="flash" id="fl-${rid}-${qnum}">saved</span>
       </div>
